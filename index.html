@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOTDONE - Tech Terminal</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+
+</head>
+
+<body>
+
+    <!-- Terminal Header -->
+    <header class="top-bar flex justify-between items-center sticky top-0 z-50 px-6">
+        <!-- Left Section: Logo & Nav -->
+        <div class="flex h-full items-center gap-8">
+            <div class="font-bold text-white flex items-center gap-2 cursor-pointer" onclick="showPage('home')">
+                <span class="text-blue-400 italic text-lg">BOTDONE</span>
+            </div>
+
+            <!-- Navigation Restored to Start -->
+            <nav class="flex h-full items-center">
+                <div onclick="showPage('home')" class="nav-link active" data-page="home">HOME</div>
+                <div onclick="showPage('sovereign')" class="nav-link" data-page="sovereign">KING SYSTEM <i
+                        class="fas fa-crown text-[10px] ml-1 text-yellow-600"></i></div>
+                <div onclick="showPage('library')" class="nav-link" data-page="library">BOTDONE LIBRARY</div>
+                <div onclick="showPage('blog')" class="nav-link" data-page="blog">BLOG</div>
+                <!-- <div onclick="showPage('admin')" id="admin-nav-link" class="nav-link text-red-400 hidden"
+                    data-page="admin">ADMIN DASHBOARD</div> -->
+                <div onclick="showPage('admin')" id="admin-nav-link" class="nav-link text-red-400 hidden"
+                    data-page="admin">ADMIN DASHBOARD</div>
+            </nav>
+        </div>
+
+        <!-- Right Section: Market & Controls -->
+        <div class="flex items-center gap-2 h-full">
+            <!-- Market Stats (MATCHING SCREENSHOT) -->
+            <div class="hidden lg:flex items-center h-full text-[9px] mono">
+
+                <!-- Market Session Group -->
+                <div class="flex items-center gap-2 px-4">
+                    <span id="market-label" class="text-gray-500 italic">MARKET:</span>
+                    <div id="market-sessions" class="flex gap-1.5 px-2">
+                        <!-- Boxed SYD, TKY, LDN, NYK badges will be injected here -->
+                    </div>
+                </div>
+
+                <span class="text-[#333]">|</span>
+
+                <!-- Live Time Group -->
+                <div class="flex items-center gap-3 px-4">
+                    <i class="far fa-clock text-blue-500"></i>
+                    <span id="live-time" class="text-white font-bold tracking-wider">00:00:00 UTC</span>
+                </div>
+
+                <span class="text-[#333]">|</span>
+
+                <!-- Day Group -->
+                <div class="px-4">
+                    <span id="day-label">DAY:</span> <span id="current-day"
+                        class="text-blue-500 font-bold ml-1">...</span>
+                </div>
+
+                <span class="text-[#333]">|</span>
+            </div>
+
+            <!-- Controls (Lang & Admin) -->
+            <div class="flex items-center gap-3 pl-4">
+                <!-- Custom Lang Switcher -->
+                <div class="lang-dropdown relative h-full flex items-center" onclick="toggleLangMenu()">
+                    <div class="flex items-center gap-2 text-[10px] mono text-dim hover:text-white transition"
+                        id="current-lang-display">
+                        <span class="text-[8px] opacity-70">sa</span> <span class="font-bold">العربية</span>
+                    </div>
+                    <div id="lang-menu" class="lang-menu">
+                        <div class="lang-option" onclick="setLang('en', '🇺🇸', 'English')">English</div>
+                        <div class="lang-option" onclick="setLang('ar', '🇸🇦', 'العربية')">العربية</div>
+                    </div>
+                </div>
+
+                <button id="login-btn" class="admin-btn-terminal mono" onclick="toggleLoginModal()">VIP</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="p-6 max-w-[1400px] mx-auto min-h-screen">
+
+        <!-- صفحة الاستقبال -->
+        <section id="home-page" class="page-content active">
+            <!-- Hero Container -->
+            <div class="tech-panel p-12 relative overflow-hidden flex flex-col md:flex-row items-center gap-12 mb-12">
+                <div class="w-full md:w-1/2">
+                    <div id="hero-sub" class="mono text-[10px] opacity-30 mb-2">SYS_V5.0.3 // INITIALIZED</div>
+                    <h1 class="text-5xl font-bold mb-6 italic leading-tight" id="hero-title">...</h1>
+                    <p class="text-lg text-dim leading-loose mb-10 border-r-4 border-blue-600 pr-6 text-justify"
+                        id="hero-desc">
+                        ...
+                    </p>
+                    <div class="flex gap-4">
+                        <button id="cta-king" onclick="showPage('sovereign')"
+                            class="btn-tech font-bold px-8 py-3">...</button>
+                        <button id="cta-library" onclick="showPage('library')"
+                            class="btn-tech bg-transparent text-dim py-3">...</button>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <!-- Hero Visual -->
+                    <div
+                        class="relative w-full aspect-video bg-black/40 border border-mt4-border rounded flex items-center justify-center overflow-hidden group">
+                        <img src="assets/hero_algo_visual.png"
+                            class="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition duration-700"
+                            alt="Algo Visual">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60">
+                        </div>
+                        <div class="absolute bottom-4 right-4 mono text-[10px] text-dim flex items-center gap-2">
+                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div> SYSTEM_CORE_ACTIVE
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CORE CAPABILITIES (New Section) -->
+            <div class="mb-12">
+                <h3 class="text-2xl font-bold text-white italic mb-8 border-l-4 border-blue-500 pl-4" id="feat-title">
+                    CORE_CAPABILITIES</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="king-card h-full">
+                        <i class="fas fa-microchip text-blue-500 text-3xl mb-4"></i>
+                        <h4 class="text-lg font-bold text-white mb-2" id="feat-1-title">QUANT_ENGINEERING</h4>
+                        <p class="text-xs text-dim leading-relaxed" id="feat-1-desc">...</p>
+                    </div>
+                    <div class="king-card h-full">
+                        <i class="fas fa-project-diagram text-blue-500 text-3xl mb-4"></i>
+                        <h4 class="text-lg font-bold text-white mb-2" id="feat-2-title">ECOSYSTEM_INTEGRATION</h4>
+                        <p class="text-xs text-dim leading-relaxed" id="feat-2-desc">...</p>
+                    </div>
+                    <div class="king-card h-full">
+                        <i class="fas fa-chart-line text-blue-500 text-3xl mb-4"></i>
+                        <h4 class="text-lg font-bold text-white mb-2" id="feat-3-title">FLOW_ANALYSIS</h4>
+                        <p class="text-xs text-dim leading-relaxed" id="feat-3-desc">...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TECHNICAL WORKFLOW (New Section) -->
+            <div class="king-card mb-12 bg-black/30">
+                <h3 class="text-2xl font-bold text-white italic mb-12 text-center" id="work-title">TECHNICAL_WORKFLOW
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 relative">
+                    <!-- Step 1 -->
+                    <div class="text-center relative">
+                        <div
+                            class="w-12 h-12 rounded-full border border-blue-500 flex items-center justify-center mx-auto mb-4 bg-black mono text-blue-500 font-bold">
+                            01</div>
+                        <h5 class="font-bold text-white text-sm mb-2" id="work-1">RESEARCH</h5>
+                        <p class="text-[10px] text-dim px-4" id="work-1-desc">...</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="text-center">
+                        <div
+                            class="w-12 h-12 rounded-full border border-blue-500 flex items-center justify-center mx-auto mb-4 bg-black mono text-blue-500 font-bold">
+                            02</div>
+                        <h5 class="font-bold text-white text-sm mb-2" id="work-2">DEVELOPMENT</h5>
+                        <p class="text-[10px] text-dim px-4" id="work-2-desc">...</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="text-center">
+                        <div
+                            class="w-12 h-12 rounded-full border border-blue-500 flex items-center justify-center mx-auto mb-4 bg-black mono text-blue-500 font-bold">
+                            03</div>
+                        <h5 class="font-bold text-white text-sm mb-2" id="work-3">BACKTESTING</h5>
+                        <p class="text-[10px] text-dim px-4" id="work-3-desc">...</p>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="text-center">
+                        <div
+                            class="w-12 h-12 rounded-full border border-blue-500 flex items-center justify-center mx-auto mb-4 bg-black mono text-blue-500 font-bold">
+                            04</div>
+                        <h5 class="font-bold text-white text-sm mb-2" id="work-4">DEPLOYMENT</h5>
+                        <p class="text-[10px] text-dim px-4" id="work-4-desc">...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STRATEGIC VISION (New Section) -->
+            <div class="tech-panel p-12 bg-gradient-to-r from-black to-blue-900/10 border-blue-900/30 mb-12">
+                <div class="max-w-3xl">
+                    <h3 class="text-3xl font-bold text-white italic mb-6" id="vision-title">OUR_MISSION</h3>
+                    <p class="text-xl text-gray-300 leading-relaxed italic" id="vision-desc">...</p>
+                    <div class="mt-8 flex items-center gap-4 text-dim mono text-[10px]">
+                        <span class="text-blue-500">●</span> AUTHENTICATED_BY_CORE
+                        <span class="text-gray-800">|</span>
+                        <span>V6.0_STABLE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FREE RESOURCES & COMMUNITY (New Section) -->
+            <div class="mb-12">
+                <h3 class="text-2xl font-bold text-white italic mb-8 border-l-4 border-blue-500 pl-4" id="res-title">
+                    OPEN_RESOURCE_ECOLOGY</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Library Info -->
+                    <div class="king-card eco-card bg-black/40 border border-gray-800 p-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div
+                                class="w-10 h-10 bg-blue-900/40 rounded flex items-center justify-center border border-blue-500/30">
+                                <i class="fas fa-book-open text-blue-500"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-white" id="res-lib-title">MASSIVE_ALGO_LIBRARY</h4>
+                        </div>
+                        <p class="text-xs text-dim leading-relaxed mb-6" id="res-lib-desc">...</p>
+                        <button onclick="showPage('library')"
+                            class="text-[10px] mono text-blue-500 hover:text-white transition">ACCESS_LIBRARY
+                            >></button>
+                    </div>
+
+                    <!-- Articles Info -->
+                    <div class="king-card eco-card bg-black/40 border border-gray-800 p-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div
+                                class="w-10 h-10 bg-blue-900/40 rounded flex items-center justify-center border border-blue-500/30">
+                                <i class="fas fa-file-alt text-blue-500"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-white" id="res-blog-title">QUANT_LOGS & SOLUTIONS</h4>
+                        </div>
+                        <p class="text-xs text-dim leading-relaxed mb-6" id="res-blog-desc">...</p>
+                        <button onclick="showPage('blog')"
+                            class="text-[10px] mono text-blue-500 hover:text-white transition">READ_LOGS >></button>
+                    </div>
+
+                    <!-- Free Access Info -->
+                    <div class="king-card eco-card border-blue-600/30 bg-blue-900/5 p-8 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 opacity-5">
+                            <i class="fas fa-unlock text-8xl text-blue-500"></i>
+                        </div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-10 h-10 bg-blue-500 rounded flex items-center justify-center">
+                                <i class="fas fa-hand-holding-heart text-black"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-white" id="res-free-title">COMMUNITY_FIRST_PHILOSOPHY</h4>
+                        </div>
+                        <p class="text-xs text-blue-200/70 leading-relaxed mb-6" id="res-free-desc">...</p>
+                        <div class="mono text-[10px] text-green-500 font-bold tracking-widest uppercase">
+                            [STATUS: 100%_FREE_ACCESS]
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- FAQ SECTION -->
+            <div class="mb-12 px-6">
+                <h3 class="text-2xl font-bold text-white italic border-l-4 border-blue-500 pl-4 mb-8" id="faq-title">
+                    FAQ</h3>
+                <div class="grid gap-4">
+                    <div class="king-card bg-black/20 border-gray-800 p-6 group hover:border-blue-500/50 transition">
+                        <div class="flex gap-4">
+                            <span class="mono text-blue-500 font-bold">Q_01</span>
+                            <div>
+                                <h4 class="text-white font-bold mb-3" id="faq-q1">...</h4>
+                                <p class="text-xs text-dim leading-relaxed" id="faq-a1">...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="king-card bg-black/20 border-gray-800 p-6 group hover:border-blue-500/50 transition">
+                        <div class="flex gap-4">
+                            <span class="mono text-blue-500 font-bold">Q_02</span>
+                            <div>
+                                <h4 class="text-white font-bold mb-3" id="faq-q2">...</h4>
+                                <p class="text-xs text-dim leading-relaxed" id="faq-a2">...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="king-card bg-black/20 border-gray-800 p-6 group hover:border-blue-500/50 transition">
+                        <div class="flex gap-4">
+                            <span class="mono text-blue-500 font-bold">Q_03</span>
+                            <div>
+                                <h4 class="text-white font-bold mb-3" id="faq-q3">...</h4>
+                                <p class="text-xs text-dim leading-relaxed" id="faq-a3">...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="king-card bg-black/20 border-gray-800 p-6 group hover:border-blue-500/50 transition">
+                        <div class="flex gap-4">
+                            <span class="mono text-blue-500 font-bold">Q_04</span>
+                            <div>
+                                <h4 class="text-white font-bold mb-3" id="faq-q4">...</h4>
+                                <p class="text-xs text-dim leading-relaxed" id="faq-a4">...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="king-card bg-black/20 border-gray-800 p-6 group hover:border-blue-500/50 transition">
+                        <div class="flex gap-4">
+                            <span class="mono text-blue-500 font-bold">Q_05</span>
+                            <div>
+                                <h4 class="text-white font-bold mb-3" id="faq-q5">...</h4>
+                                <p class="text-xs text-dim leading-relaxed" id="faq-a5">...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- صفحة NEURAL VAULT (Rich & Long Terminal Expansion) -->
+        <section id="sovereign-page" class="page-content">
+            <!-- 1. Technical Header -->
+            <div class="king-card">
+                <div class="king-header">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="mono text-[10px] text-blue-500 mb-2 block" id="protocol-sub">//
+                                PROTOCOL_V6.0_INITIALIZED</span>
+                            <h2 class="king-title" id="king-title">NEURAL VAULT</h2>
+                        </div>
+                        <div class="text-right mono text-[10px] text-dim">
+                            <div>AUTH_LEVEL: ELITE</div>
+                            <div>ENCRYPT: AES-256</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="md:col-span-2">
+                        <p id="king-desc" class="text-xl text-gray-300 leading-relaxed mb-8 italic">
+                            <!-- Injected via JS -->
+                        </p>
+                    </div>
+                    <div class="matrix-container">
+                        <div id="king-intro">
+                            <!-- Dynamic Intro -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Technical Specifications Grid -->
+                <div class="tech-spec-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">CORE_ENGINE</span>
+                        <span class="spec-value">HYBRID_AI_V2</span>
+                        <div class="tech-progress">
+                            <div class="progress-fill" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">LATENCY_PROTOCOL</span>
+                        <span class="spec-value">0.003ms</span>
+                        <div class="tech-progress">
+                            <div class="progress-fill" style="width: 98%"></div>
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">DATA_SOURCE</span>
+                        <span class="spec-value">TIER_1_LIQUIDITY</span>
+                        <div class="tech-progress">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Algorithmic Deep Dive -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="king-card">
+                    <h3 class="text-2xl font-bold mb-6 italic text-white" id="pillar-1-title">Pillar 1</h3>
+                    <p class="text-dim leading-loose mb-6" id="pillar-1-desc">...</p>
+                    <div class="matrix-container text-[10px]" style="color: #666">
+                        RENDER_LOG: ISOLATING_TIME_VARIABLE... SUCCESS
+                    </div>
+                </div>
+                <div class="king-card">
+                    <h3 class="text-2xl font-bold mb-6 italic text-white" id="pillar-2-title">Pillar 2</h3>
+                    <p class="text-dim leading-loose mb-6" id="pillar-2-desc">...</p>
+                    <div class="matrix-container text-[10px]" style="color: #666">
+                        RENDER_LOG: NEURAL_MAPPING_PHASE_4... ACTIVE
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Implementation Matrix Section (NEW) -->
+            <div class="king-card mb-8">
+                <div class="border-l-4 border-blue-600 pl-6 py-2 mb-8">
+                    <h3 class="text-2xl font-bold text-white italic" id="hft-context-title">ALGORITHMIC_SOVEREIGNTY</h3>
+                    <p class="text-sm text-dim mt-2" id="hft-context">...</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-6 bg-black/40 border border-[#222]">
+                        <h4 class="text-blue-500 font-bold mb-3 mono text-xs" id="logic-1-title">Logic Block A</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed" id="logic-1-desc">...</p>
+                    </div>
+                    <div class="p-6 bg-black/40 border border-[#222]">
+                        <h4 class="text-blue-500 font-bold mb-3 mono text-xs" id="logic-2-title">Logic Block B</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed" id="logic-2-desc">...</p>
+                    </div>
+                    <div class="p-6 bg-black/40 border border-[#222]">
+                        <h4 class="text-blue-500 font-bold mb-3 mono text-xs" id="logic-3-title">Logic Block C</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed" id="logic-3-desc">...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Admission & Partnership (Longer Footer) -->
+            <div class="king-card bg-gradient-to-b from-transparent to-blue-900/5">
+                <div class="max-w-4xl mx-auto text-center py-12">
+                    <i class="fas fa-microchip text-5xl text-blue-600/30 mb-8 animate-pulse"></i>
+                    <h2 class="text-4xl font-bold mb-6 italic text-white" id="partnership-title">...</h2>
+                    <p class="text-lg text-dim mb-12 max-w-2xl mx-auto leading-relaxed" id="partnership-desc">...</p>
+
+                    <div class="grid md:grid-cols-2 gap-8 mb-12 text-left">
+                        <div class="p-6 border border-mt4-border bg-black/60 relative">
+                            <span class="absolute top-0 right-0 p-2 text-[8px] mono text-gray-800">NOTICE_01</span>
+                            <p class="text-xs italic text-gray-400" id="warning-desc">...</p>
+                        </div>
+                        <div class="p-6 border border-blue-900/40 bg-blue-900/5 relative">
+                            <span class="absolute top-0 right-0 p-2 text-[8px] mono text-blue-900">DIRECTIVE_02</span>
+                            <p class="text-xs italic text-blue-200" id="vault-def">...</p>
+                        </div>
+                    </div>
+
+                    <button onclick="showPage('admission')"
+                        class="btn-tech px-12 py-5 text-xl font-bold hover:scale-105 transition transform">
+                        <span id="apply-btn">REQUEST_ACCESS</span>
+                    </button>
+                    <div class="mt-6 mono text-[9px] text-gray-600" id="recruitment-label">ADMISSION_PROTOCOL_ACTIVE
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- صفحة طلب الانضمام (New Admission Page Section) -->
+        <section id="admission-page" class="page-content">
+            <div class="max-w-4xl mx-auto py-12">
+                <button onclick="showPage('sovereign')"
+                    class="mb-12 text-xs font-bold text-dim hover:text-white flex items-center gap-2 mono">
+                    <i class="fas fa-arrow-left"></i> RETURN_TO_LEVEL_1
+                </button>
+
+                <div class="king-card">
+                    <div class="mb-8 border-b border-gray-800 pb-6">
+                        <h2 class="text-3xl font-bold text-white italic" id="modal-title">ADMISSION PROTOCOL</h2>
+                        <p class="mono text-[10px] text-blue-500 mt-2" id="recruitment-label-page">
+                            SECURITY_CLEARANCE_REQUIRED</p>
+                    </div>
+
+                    <form id="admission-form" onsubmit="submitAdmissionForm(event)" class="space-y-8">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="space-y-2">
+                                <label class="block text-xs mono text-dim uppercase tracking-wider"
+                                    id="modal-name-label">IDENTIFIER (NAME)</label>
+                                <input type="text" id="adm-name" required
+                                    class="w-full bg-black/40 border border-[#444] p-4 text-white mono focus:border-blue-500 outline-none transition">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs mono text-dim uppercase tracking-wider"
+                                    id="modal-email-label">ENDPOINT (EMAIL)</label>
+                                <input type="email" id="adm-email" required
+                                    class="w-full bg-black/40 border border-[#444] p-4 text-white mono focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-xs mono text-dim uppercase tracking-wider"
+                                id="modal-role-label">CLEARANCE_LEVEL (ROLE)</label>
+                            <select id="adm-role" required
+                                class="w-full bg-black/40 border border-[#444] p-4 text-white mono focus:border-blue-500 outline-none transition appearance-none">
+                                <option id="role-dev" value="dev">QUANT_DEVELOPER</option>
+                                <option id="role-trader" value="trader">EXECUTIVE_VETERAN</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-xs mono text-dim uppercase tracking-wider"
+                                id="modal-msg-label">TRANSMISSION (MESSAGE)</label>
+                            <textarea id="adm-msg" required rows="6"
+                                class="w-full bg-black/40 border border-[#444] p-4 text-white mono focus:border-blue-500 outline-none transition resize-none"></textarea>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" id="modal-submit"
+                                class="w-full btn-tech font-bold py-6 text-xl hover:bg-blue-600 transition shadow-lg">
+                                SEND_TRANSMISSION
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="mt-8 text-center text-[10px] mono text-gray-600">
+                    ENCRYPTION_ACTIVE // SECURE_CHANNEL_v6.0
+                </div>
+            </div>
+        </section>
+
+        <!-- صفحة المكتبة -->
+        <section id="library-page" class="page-content">
+            <h2 class="text-2xl font-bold mb-8 italic border-b border-gray-700 pb-2">BOTDONE LIBRARY <span
+                    class="text-sm font-normal text-dim not-italic ml-2">// OPEN SOURCE</span></h2>
+            <div id="library-grid" class="grid md:grid-cols-3 gap-6">
+                <!-- Items will be injected here via JS -->
+            </div>
+        </section>
+
+        <!-- صفحة المدونة (NEW) -->
+        <section id="blog-page" class="page-content">
+            <div class="flex justify-between items-end mb-8 border-b border-gray-700 pb-2">
+                <h2 id="blog-page-title" class="text-2xl font-bold italic">Development Logs & Technical Articles</h2>
+                <div class="mono text-[10px] text-dim">LATEST_LOGS_RETRIEVED</div>
+            </div>
+
+            <div id="blog-grid" class="grid md:grid-cols-3 gap-8">
+                <!-- Blog items will be injected here via JS -->
+            </div>
+            </div>
+        </section>
+
+
+        <!-- صفحة تفاصيل العنصر (Landing Page for Item) -->
+        <section id="item-page" class="page-content">
+            <button onclick="showPage('library')"
+                class="mb-6 text-xs font-bold text-dim hover:text-white flex items-center gap-2">
+                <i class="fas fa-arrow-right"></i> BACK TO LIBRARY
+            </button>
+
+            <div class="tech-panel p-0 overflow-hidden max-w-4xl mx-auto">
+                <!-- Large Hero Image -->
+                <div class="w-full aspect-video bg-black/50 relative border-b border-gray-800">
+                    <img id="landing-img" src="" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
+
+                    <div class="absolute bottom-8 right-8 text-right">
+                        <span id="landing-platform"
+                            class="text-xs font-bold bg-blue-900/50 text-blue-200 px-3 py-1 rounded border border-blue-500/30 mb-2 inline-block">PLATFORM</span>
+                        <h1 id="landing-title" class="text-4xl md:text-5xl font-bold text-white italic drop-shadow-lg">
+                            ITEM NAME</h1>
+                    </div>
+                </div>
+
+                <!-- Content & Action -->
+                <div class="p-10 md:p-16 text-center">
+                    <p id="landing-desc"
+                        class="text-lg text-gray-300 leading-loose mb-10 max-w-2xl mx-auto border-b border-gray-800 pb-10">
+                        Description goes here...
+                    </p>
+
+                    <a id="landing-dl" href="#" target="_blank"
+                        class="block w-full md:w-2/3 mx-auto btn-tech bg-blue-600 hover:bg-blue-500 text-white font-bold text-xl py-6 rounded border-none shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_40px_rgba(37,99,235,0.5)] transition-all transform hover:-translate-y-1">
+                        <i class="fas fa-download mr-3"></i> DOWNLOAD NOW
+                    </a>
+                    <div class="mt-4 mono text-[10px] text-dim">SECURE_LINK // DIRECT_ACCESS</div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- صفحة قراءة المقال (Blog Post Reader Simplification) -->
+        <section id="blog-post-page" class="page-content">
+            <button onclick="showPage('blog')"
+                class="mb-6 text-xs font-bold text-dim hover:text-white flex items-center gap-2 mono">
+                <i class="fas fa-arrow-left"></i> RETURN_TO_LOGS
+            </button>
+
+            <div class="max-w-4xl mx-auto">
+                <!-- 1. Hero Image -->
+                <div
+                    class="w-full aspect-video bg-black/50 border border-[#333] mb-12 overflow-hidden rounded shadow-2xl">
+                    <img id="post-img" src="" class="w-full h-full object-cover">
+                </div>
+
+                <!-- 2. Header: Title & Subtitle -->
+                <div class="mb-12 border-l-4 border-[#FF6B00] pl-6">
+                    <div class="text-[10px] mono text-dim mb-2" id="post-date">YYYY-MM-DD</div>
+                    <h1 id="post-title" class="text-3xl md:text-5xl font-bold text-white font-mono leading-tight mb-4">
+                        Article Title</h1>
+                    <h3 id="post-subtitle" class="text-lg md:text-xl text-[#FF6B00] font-mono italic opacity-90">
+                        Secondary Subtitle Description...</h3>
+                </div>
+
+                <!-- 3. Text Content -->
+                <div id="post-content"
+                    class="text-gray-300 text-lg leading-loose space-y-6 text-justify opacity-90 font-sans">
+                    <!-- Content injected here -->
+                </div>
+
+                <!-- Signature -->
+                <div class="mt-20 pt-8 border-t border-[#333] flex justify-between text-[10px] mono text-dim">
+                    <span>AUTH: BOTDONE_CORE</span>
+                    <span>END_OF_FILE</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="tech-panel p-8 w-[350px] relative shadow-2xl">
+            <button class="absolute top-2 right-2 text-dim hover:text-white" onclick="toggleLoginModal()">✕</button>
+            <h3 class="text-xl font-bold mb-6 italic text-center">ACCESS TERMINAL</h3>
+
+            <div class="mb-4">
+                <label class="block text-xs mono text-dim mb-1">IDENTIFIER (EMAIL)</label>
+                <input type="text" id="login-email"
+                    class="w-full bg-black border border-mt4-border p-2 text-white mono focus:border-mt4-accent outline-none">
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-xs mono text-dim mb-1">SECURITY CODE</label>
+                <input type="password" id="login-code"
+                    class="w-full bg-black border border-mt4-border p-2 text-white mono focus:border-mt4-accent outline-none">
+            </div>
+
+            <button onclick="attemptLogin()" class="w-full btn-tech font-bold py-2">AUTHENTICATE</button>
+        </div>
+    </div>
+
+    <!-- Custom Toast Notification -->
+    <div id="toast-notification" class="toast-notification">
+        <div class="toast-content">
+            <i class="fas fa-check-circle toast-icon"></i>
+            <div class="toast-text">
+                <span class="toast-title">[SYSTEM]</span>
+                <span class="toast-message">Message Transmitted Successfully</span>
+            </div>
+            <button class="toast-close" onclick="closeToast()">✕</button>
+        </div>
+    </div>
+
+
+
+    <!-- Professional Footer Section -->
+    <footer class="professional-footer mt-20">
+        <div class="container mx-auto px-6 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <!-- About Column -->
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold tracking-tighter text-lg" id="footer-about-title">ABOUT BOTDONE</h3>
+                    <p class="text-dim text-xs leading-relaxed" id="footer-about-text">
+                        A premier engineering collective dedicated to the development of high-frequency algorithmic
+                        solutions and pure mathematical trading frameworks.
+                    </p>
+                    <div class="pt-4 flex gap-4 text-dim">
+                        <a href="https://t.me/+E5YObhxy-zU1ZGE0" target="_blank"
+                            class="hover:text-blue-500 transition"><i class="fab fa-telegram-plane text-xl"></i></a>
+                        <a href="https://github.com/YACINE33334" target="_blank"
+                            class="hover:text-blue-500 transition"><i class="fab fa-github text-xl"></i></a>
+                        <a href="mailto:codwep2@gmail.com" class="hover:text-blue-500 transition"><i
+                                class="fas fa-envelope text-xl"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links Column -->
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold tracking-tighter text-lg" id="footer-links-title">QUICK NAVIGATION
+                    </h3>
+                    <ul class="space-y-2 text-xs mono text-dim">
+                        <li><a href="javascript:void(0)" onclick="showPage('home')"
+                                class="hover:text-white transition cursor-pointer">/root/home</a></li>
+                        <li><a href="javascript:void(0)" onclick="showPage('sovereign')"
+                                class="hover:text-white transition cursor-pointer">/root/neural_vault</a></li>
+                        <li><a href="javascript:void(0)" onclick="showPage('library')"
+                                class="hover:text-white transition cursor-pointer">/root/library</a></li>
+                    </ul>
+                </div>
+
+                <!-- Disclaimer Column -->
+                <div class="md:col-span-2 space-y-4">
+                    <h3 class="text-white font-bold tracking-tighter text-lg" id="footer-disclaimer-title">RISK
+                        DISCLAIMER</h3>
+                    <div class="p-4 border border-gray-800 bg-black/20 rounded-sm">
+                        <p class="text-[10px] text-dim leading-relaxed uppercase mono" id="footer-disclaimer-text">
+                            Trading involves significant risk. Our systems are technical tools and do not constitute
+                            financial advice. Past performance is never indicative of future results. All information
+                            provided is for educational purposes only.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="mt-16 pt-8 border-t border-gray-900 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] mono text-dim" id="footer-rights">ALL RIGHTS RESERVED //
+                        SECURE_NODE_6.0</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                    <span class="text-[9px] mono text-blue-500 uppercase">System Status: Operational</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

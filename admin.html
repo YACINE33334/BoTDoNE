@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BOTDONE CMS // CORE</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+
+</head>
+
+<body class="bg-[#0b0b0b] text-gray-300 font-sans min-h-screen">
+
+    <div id="admin-root" class="flex min-h-screen">
+
+        <!-- SIDEBAR -->
+        <aside class="w-64 border-r border-gray-800 flex flex-col bg-black/50">
+            <div class="p-6 border-b border-gray-800">
+                <h1 class="font-bold text-xl italic text-white">BOTDONE <span
+                        class="text-red-500 font-mono text-sm">CMS</span></h1>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="switchTab('global')"
+                    class="w-full text-left p-3 text-xs font-bold hover:bg-gray-800 rounded text-white border-l-2 border-blue-500">
+                    <i class="fas fa-globe w-6"></i> GLOBAL CONTENT
+                </button>
+                <button onclick="switchTab('library')"
+                    class="w-full text-left p-3 text-xs font-bold hover:bg-gray-800 rounded text-dim transition">
+                    <i class="fas fa-book w-6"></i> LIBRARY MANAGER
+                </button>
+                <button onclick="switchTab('blog')"
+                    class="w-full text-left p-3 text-xs font-bold hover:bg-gray-800 rounded text-dim transition">
+                    <i class="fas fa-pen w-6"></i> BLOG MANAGER
+                </button>
+                <button onclick="switchTab('monitoring')"
+                    class="w-full text-left p-3 text-xs font-bold hover:bg-gray-800 rounded text-dim transition">
+                    <i class="fas fa-satellite-dish w-6"></i> LIVE MONITORING
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-gray-800">
+                <button onclick="resetDB()"
+                    class="w-full border border-red-900 text-red-700 hover:bg-red-900/20 py-2 text-[10px] mono">
+                    [FACTORY RESET]
+                </button>
+                <a href="index.html" class="block text-center mt-4 text-[10px] text-blue-500 hover:text-white">
+                    <i class="fas fa-external-link-alt"></i> OPEN LIVE SITE
+                </a>
+            </div>
+        </aside>
+
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 p-8 overflow-y-auto">
+
+            <!-- GLOBAL TAB -->
+            <section id="tab-global" class="admin-tab">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-white italic">Global Content Config</h2>
+                    <button onclick="adminSaveGlobal()"
+                        class="btn-tech bg-green-900/20 text-green-400 border-green-800 hover:bg-green-900">
+                        <i class="fas fa-save mr-2"></i> PUBLISH CHANGES
+                    </button>
+                </div>
+
+                <div class="grid gap-8 max-w-4xl">
+                    <!-- SYSTEM TIME CONTROL (MASTER V2) -->
+                    <div class="tech-panel p-6 border border-green-900/30 bg-green-900/5">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-3">
+                                <h3 class="font-bold text-green-500 text-lg italic">MASTER CONTROL</h3>
+                                <span
+                                    class="text-[10px] mono text-green-800 bg-green-500/10 px-2 py-1 rounded">V2.0</span>
+                            </div>
+                            <div id="sys-status-badge"
+                                class="px-2 py-1 bg-green-900/30 text-green-500 text-[10px] mono border border-green-900 rounded">
+                                LIVE: AUTO
+                            </div>
+                        </div>
+
+                        <!-- 1. TIME CONTROL -->
+                        <div class="mb-6 pb-6 border-b border-green-900/20">
+                            <div class="flex justify-between mb-2">
+                                <label class="block text-xs font-bold text-green-100"><i class="fas fa-clock mr-1"></i>
+                                    CLOCK SOURCE</label>
+                                <select id="sys-time-mode"
+                                    class="admin-input border-green-900/50 w-32 py-0 h-6 text-[10px]"
+                                    onchange="toggleTimeInputs()">
+                                    <option value="AUTO">AUTO (UTC)</option>
+                                    <option value="MANUAL">MANUAL</option>
+                                </select>
+                            </div>
+
+                            <!-- Manual Time Input -->
+                            <div id="manual-time-group"
+                                class="opacity-50 pointer-events-none transition-opacity grid grid-cols-3 gap-2 mt-2">
+                                <div>
+                                    <span class="text-[9px] mono text-dim mb-1 block">HOUR</span>
+                                    <input type="number" id="in-time-h"
+                                        class="admin-input w-full text-center text-lg font-bold text-green-500" min="0"
+                                        max="23" placeholder="HH">
+                                </div>
+                                <div>
+                                    <span class="text-[9px] mono text-dim mb-1 block">MIN</span>
+                                    <input type="number" id="in-time-m"
+                                        class="admin-input w-full text-center text-lg font-bold text-green-500" min="0"
+                                        max="59" placeholder="MM">
+                                </div>
+                                <div>
+                                    <span class="text-[9px] mono text-dim mb-1 block">SEC</span>
+                                    <input type="number" id="in-time-s"
+                                        class="admin-input w-full text-center text-lg font-bold text-green-500" min="0"
+                                        max="59" placeholder="SS">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. MARKET CONTROL -->
+                        <div class="mb-4">
+                            <div class="flex justify-between mb-2">
+                                <label class="block text-xs font-bold text-green-100"><i
+                                        class="fas fa-chart-line mr-1"></i> MARKET LOGIC</label>
+                                <select id="sys-market-mode"
+                                    class="admin-input border-green-900/50 w-32 py-0 h-6 text-[10px]"
+                                    onchange="toggleMarketInputs()">
+                                    <option value="AUTO">AUTO (By Time)</option>
+                                    <option value="MANUAL">MANUAL (Force)</option>
+                                </select>
+                            </div>
+
+                            <!-- Manual Session Select -->
+                            <div id="manual-market-group"
+                                class="opacity-50 pointer-events-none transition-opacity mt-2">
+                                <select id="sys-active-session" class="admin-input w-full font-bold text-green-500">
+                                    <option value="NONE">ALL CLOSED (Force Close)</option>
+                                    <option value="SYD">SYDNEY (SYD)</option>
+                                    <option value="TKY">TOKYO (TKY)</option>
+                                    <option value="LDN">LONDON (LDN)</option>
+                                    <option value="NYK">NEW YORK (NYK)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-4 flex justify-between items-center">
+                            <span class="text-[9px] text-green-900 italic">Config applies immediately to all
+                                users.</span>
+                            <button onclick="adminSaveMasterSettings()"
+                                class="btn-tech bg-green-600 hover:bg-green-500 text-black font-bold text-xs px-4 py-2">
+                                <i class="fas fa-save mr-1"></i> UPDATE MASTER
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Hero Section -->
+                    <div class="tech-panel p-6 border border-gray-800">
+                        <span class="mono text-[10px] text-blue-500 mb-4 block">SECT: HOMEPAGE_HERO</span>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold mb-2">Main Title (HTML Allowed)</label>
+                            <input type="text" id="in-hero-title" class="admin-input w-full" value="">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold mb-2">Description</label>
+                            <textarea id="in-hero-desc" class="admin-input w-full h-24"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- King System Section -->
+                    <div class="tech-panel p-6 border border-gray-800">
+                        <span class="mono text-[10px] text-yellow-600 mb-4 block">SECT: KING_SYSTEM_PAGE</span>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold mb-2">Section Title</label>
+                            <input type="text" id="in-king-title" class="admin-input w-full">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold mb-2">Main Description</label>
+                            <textarea id="in-king-desc" class="admin-input w-full h-32"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- LIBRARY TAB -->
+            <section id="tab-library" class="admin-tab hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-white italic">Library Inventory</h2>
+                </div>
+
+                <div class="flex gap-8">
+                    <!-- Table -->
+                    <div class="flex-1 tech-panel p-0 overflow-hidden border border-gray-800">
+                        <table class="w-full text-left">
+                            <thead class="bg-white/5 text-[10px] mono text-gray-400 uppercase">
+                                <tr>
+                                    <th class="p-3">ID</th>
+                                    <th class="p-3">Name</th>
+                                    <th class="p-3">Platform</th>
+                                    <th class="p-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lib-table-body" class="tech-border-rows">
+                                <!-- JS Injection -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Add Form -->
+                    <div class="w-80 tech-panel p-6 border border-gray-800 h-fit bg-blue-900/5">
+                        <h3 class="font-bold text-white mb-4 italic">+ Add New Tool</h3>
+
+                        <div class="space-y-4">
+                            <input type="text" id="add-lib-name" placeholder="Tool Name" class="admin-input w-full">
+
+                            <select id="add-lib-platform" class="admin-input w-full">
+                                <option value="MT4">MetaTrader 4</option>
+                                <option value="MT5">MetaTrader 5</option>
+                                <option value="cTrader">cTrader</option>
+                                <option value="Other">Other</option>
+                            </select>
+
+                            <textarea id="add-lib-desc" placeholder="Brief Description..."
+                                class="admin-input w-full h-20"></textarea>
+                            <input type="text" id="add-lib-link" placeholder="Download Link (URL)"
+                                class="admin-input w-full">
+                            <input type="text" id="add-lib-img" placeholder="Image URL (Optional)"
+                                class="admin-input w-full">
+
+                            <button onclick="adminAddLibItem()"
+                                class="w-full btn-tech bg-blue-600 hover:bg-blue-500 text-white border-none py-2 mt-2">
+                                SUBMIT TO DB
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- BLOG COMPOSER TAB -->
+            <section id="tab-blog" class="admin-tab hidden" style="border-left: 2px solid #FF6B00; padding-left: 20px;">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-white italic mono">DEV_LOG_MANAGER <span
+                            class="text-[#FF6B00] text-sm">// v2.0</span></h2>
+                </div>
+
+                <div class="flex gap-8 h-full">
+                    <!-- List/Table -->
+                    <div class="w-1/3 tech-panel p-0 overflow-y-auto border border-gray-800 h-[600px]">
+                        <table class="w-full text-left">
+                            <thead class="bg-[#111] text-[10px] mono text-gray-500 uppercase sticky top-0">
+                                <tr>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Title</th>
+                                    <th class="p-3">Cat</th>
+                                    <th class="p-3 text-right">Act</th>
+                                </tr>
+                            </thead>
+                            <tbody id="blog-table-body" class="tech-border-rows">
+                                <!-- JS Injection -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Editor -->
+                    <div class="flex-1 tech-panel p-6 border border-[#333] bg-[#0c0c0c] flex flex-col gap-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-white italic">COMPOSER</h3>
+                            <div class="mono text-[10px] text-dim">MARKDOWN_SUPPORT: ACTIVE</div>
+                        </div>
+
+                        <!-- Meta Row -->
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="col-span-2">
+                                <label class="block text-[10px] mono text-dim mb-1">TITLE</label>
+                                <input type="text" id="add-blog-title" placeholder="Log Title..."
+                                    class="admin-input w-full border-[#333] focus:border-[#FF6B00]">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] mono text-dim mb-1">DATE</label>
+                                <input type="date" id="add-blog-date" class="admin-input w-full text-dim">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] mono text-dim mb-1">STATUS</label>
+                                <select id="add-blog-status" class="admin-input w-full text-[#FF6B00] font-bold">
+                                    <option value="DRAFT">DRAFT</option>
+                                    <option value="PUBLISHED">PUBLISHED</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Second Row -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] mono text-dim mb-1">SUBTITLE / CAPTION</label>
+                                <input type="text" id="add-blog-subtitle" placeholder="Brief subtitle..."
+                                    class="admin-input w-full">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] mono text-dim mb-1">MAIN IMAGE URL</label>
+                                <input type="text" id="add-blog-img" placeholder="https://..."
+                                    class="admin-input w-full">
+                            </div>
+                        </div>
+
+                        <!-- Third Row: Meta -->
+                        <div class="grid grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-[10px] mono text-dim mb-1">CATEGORY</label>
+                                <select id="add-blog-cat" class="admin-input w-full">
+                                    <option value="LOGIC">ALGO LOGIC</option>
+                                    <option value="MT4">METATRADER 4</option>
+                                    <option value="CTRADER">cTRADER</option>
+                                    <option value="HFT">HFT RESEARCH</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] mono text-dim mb-1">READ TIME</label>
+                                <input type="text" id="add-blog-time" placeholder="e.g. 5 MIN"
+                                    class="admin-input w-full">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] mono text-dim mb-1">RELATED TOOL (ID)</label>
+                                <input type="text" id="add-blog-related" placeholder="Library Item ID..."
+                                    class="admin-input w-full">
+                            </div>
+                        </div>
+
+                        <!-- Editor Area -->
+                        <div class="flex-1 flex flex-col">
+                            <label class="block text-[10px] mono text-dim mb-1">CONTENT (TEXT ONLY)</label>
+                            <textarea id="add-blog-content" placeholder="Write your technical log here..."
+                                class="admin-input w-full flex-1 font-mono text-sm leading-relaxed p-4 bg-black text-gray-300 focus:border-[#FF6B00]"></textarea>
+                        </div>
+
+                        <button onclick="adminAddBlogItem()"
+                            class="w-full btn-tech bg-[#FF6B00] hover:bg-orange-600 text-black font-bold uppercase py-3 mt-2 tracking-widest">
+                            SAVE_LOG_ENTRY
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LIVE MONITORING TAB -->
+            <section id="tab-monitoring" class="admin-tab hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-white italic mono">LIVE_MONITORING <span
+                            class="text-green-500 text-sm">// REAL-TIME_TRAFFIC</span></h2>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="text-[10px] mono text-green-500">SYSTEM_ACTIVE</span>
+                    </div>
+                </div>
+
+                <!-- Total Active Counter -->
+                <div class="tech-panel p-8 mb-8 bg-gradient-to-r from-green-900/10 to-transparent border-green-900/30">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="mono text-[10px] text-green-600 mb-2">ACTIVE_VISITORS</div>
+                            <div class="flex items-baseline gap-4">
+                                <span id="active-count" class="text-6xl font-bold text-white mono">0</span>
+                                <span class="text-xl text-dim mono">ONLINE</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <i class="fas fa-users text-6xl text-green-500 opacity-20"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Country Distribution -->
+                <div class="tech-panel p-6 border border-gray-800">
+                    <div class="flex items-center justify-between mb-6 border-b border-gray-800 pb-4">
+                        <h3 class="font-bold text-white mono text-sm">GEOGRAPHIC_DISTRIBUTION</h3>
+                        <i class="fas fa-globe-americas text-blue-500"></i>
+                    </div>
+
+                    <div id="country-list" class="space-y-2">
+                        <!-- Country items will be injected here -->
+                        <div class="text-center text-dim py-8 mono text-xs">
+                            <i class="fas fa-satellite-dish text-2xl mb-2 opacity-30"></i>
+                            <div>WAITING_FOR_DATA...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MASTER TIME CONTROL TAB (SEPARATE) -->
+            <section id="tab-time" class="admin-tab hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-white italic mono">MASTER_TIME_CONTROL <span
+                            class="text-green-600 text-sm">// SUPER_ADMIN_V2</span></h2>
+                    <div id="sys-status-badge"
+                        class="px-3 py-1 bg-green-900/30 text-green-500 text-xs mono border border-green-900 rounded">
+                        SYSTEM: AUTO
+                    </div>
+                </div>
+
+                <div class="flex gap-8">
+                    <!-- LEFT: CONTROL PANEL -->
+                    <div class="w-1/2 tech-panel p-8 border border-green-900/30 bg-green-900/5">
+                        <h3 class="font-bold text-green-500 mb-6 border-b border-green-900/30 pb-2">
+                            <i class="fas fa-sliders-h mr-2"></i> CONFIGURATION
+                        </h3>
+
+                        <!-- 1. TIME CONTROL -->
+                        <div class="mb-8">
+                            <div class="flex justify-between mb-4">
+                                <label class="block text-sm font-bold text-green-100"><i class="fas fa-clock mr-2"></i>
+                                    CLOCK SOURCE</label>
+                                <select id="sys-time-mode" class="admin-input border-green-900/50 w-40 py-1"
+                                    onchange="toggleTimeInputs()">
+                                    <option value="AUTO">AUTO (UTC)</option>
+                                    <option value="MANUAL">MANUAL</option>
+                                </select>
+                            </div>
+
+                            <!-- Manual Time Input -->
+                            <div id="manual-time-group"
+                                class="opacity-50 pointer-events-none transition-opacity bg-black/40 p-4 border border-green-900/20 rounded">
+                                <span class="text-[10px] mono text-green-500/50 mb-3 block text-center">SET TARGET UTC
+                                    TIME</span>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div>
+                                        <input type="number" id="in-time-h"
+                                            class="admin-input w-full text-center text-2xl font-bold text-green-500"
+                                            min="0" max="23" placeholder="HH">
+                                    </div>
+                                    <div>
+                                        <input type="number" id="in-time-m"
+                                            class="admin-input w-full text-center text-2xl font-bold text-green-500"
+                                            min="0" max="59" placeholder="MM">
+                                    </div>
+                                    <div>
+                                        <input type="number" id="in-time-s"
+                                            class="admin-input w-full text-center text-2xl font-bold text-green-500"
+                                            min="0" max="59" placeholder="SS">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. MARKET CONTROL -->
+                        <div class="mb-8">
+                            <div class="flex justify-between mb-4">
+                                <label class="block text-sm font-bold text-green-100"><i
+                                        class="fas fa-chart-line mr-2"></i> MARKET LOGIC</label>
+                                <select id="sys-market-mode" class="admin-input border-green-900/50 w-40 py-1"
+                                    onchange="toggleMarketInputs()">
+                                    <option value="AUTO">AUTO (By Time)</option>
+                                    <option value="MANUAL">MANUAL (Force)</option>
+                                </select>
+                            </div>
+
+                            <!-- Manual Session Select -->
+                            <div id="manual-market-group"
+                                class="opacity-50 pointer-events-none transition-opacity bg-black/40 p-4 border border-green-900/20 rounded">
+                                <span class="text-[10px] mono text-green-500/50 mb-2 block">FORCE ACTIVE SESSION</span>
+                                <select id="sys-active-session"
+                                    class="admin-input w-full font-bold text-green-500 text-lg">
+                                    <option value="NONE">ALL CLOSED (Force Close)</option>
+                                    <option value="SYD">SYDNEY (SYD)</option>
+                                    <option value="TKY">TOKYO (TKY)</option>
+                                    <option value="LDN">LONDON (LDN)</option>
+                                    <option value="NYK">NEW YORK (NYK)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- SAVE -->
+                        <button onclick="adminSaveMasterSettings()"
+                            class="w-full btn-tech bg-green-600 hover:bg-green-500 text-black font-bold text-sm px-6 py-4 uppercase tracking-widest shadow-lg shadow-green-900/20">
+                            <i class="fas fa-save mr-2"></i> APPLY MASTER CONFIG
+                        </button>
+                    </div>
+
+                    <!-- RIGHT: INFO / PREVIEW -->
+                    <div class="w-1/2 space-y-4">
+                        <div class="tech-panel p-6 border border-gray-800 opacity-70">
+                            <h4 class="text-xs font-bold text-gray-500 mb-2">HOW IT WORKS</h4>
+                            <p class="text-xs text-dim leading-relaxed mb-4">
+                                <strong class="text-gray-300">AUTO MODE:</strong> System follows real-world UTC time.
+                                Market opens/closes based on strictly defined schedule.<br><br>
+                                <strong class="text-gray-300">MANUAL TIME:</strong> You set a specific time. The system
+                                calculates the offset and "freezes" the site to that time logic relative to real time
+                                flow.<br><br>
+                                <strong class="text-gray-300">MANUAL MARKET:</strong> Overrides all time logic. If you
+                                select "LONDON", London is OPEN green, others are closed. "WEEKEND" labels are removed.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+        </main>
+    </div>
+
+    <!-- TAB SWITCHER LOGIC & EDITOR UTILS -->
+    <script>
+        function switchTab(tabName) {
+            // Hide all
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
+            // Show target
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+        }
+
+        function insertImgTag() {
+            const url = prompt("Enter Image URL:", "https://");
+            if (!url) return;
+
+            const tag = `\\n<img src="${url}" class="w-full rounded border border-[#333] my-4 shadow-lg" alt="Log Image">\\n`;
+
+            const textarea = document.getElementById('add-blog-content');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+
+            // Insert text
+            textarea.value = textarea.value.substring(0, start) + tag + textarea.value.substring(end);
+
+            // Move cursor after insertion
+            textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+            textarea.focus();
+        }
+    </script>
+    <script src="script.js"></script>
+
+    <style>
+        .admin-input {
+            background-color: rgb(15, 15, 15);
+            border: 1px solid #333;
+            color: white;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .admin-input:focus {
+            border-color: #3b82f6;
+            background-color: black;
+        }
+    </style>
+</body>
+
+</html>
